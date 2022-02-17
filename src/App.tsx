@@ -10,7 +10,7 @@ import { useSettings } from "./hooks/useSettings";
 import { Worldle } from "./components/Worldle";
 
 function App() {
-  const { t, i18n } = useTranslation();
+  const { t, i18n } = useTranslation("sq");
 
   const [infoOpen, setInfoOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -65,7 +65,7 @@ function App() {
               ❔
             </button>
             <h1 className="text-4xl font-bold uppercase tracking-wide text-center my-1 flex-auto">
-              Wor<span className="text-green-600">l</span>dle
+              Bot<span className="text-green-600">ë</span>z
             </h1>
             <button
               className="mx-3 text-xl"

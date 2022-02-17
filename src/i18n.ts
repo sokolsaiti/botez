@@ -1,8 +1,30 @@
 import i18n from "i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
 
 const resources = {
+  sq: {
+    translation: {
+      placeholder: "Shteti, territori...",
+      guess: "Qëllo",
+      share: "Ndaj",
+      showOnGoogleMaps: "👀 në Google Maps",
+      welldone: "Bravo!",
+      unknownCountry: "Shtet i panjohur!",
+      copy: "Rezultatet u kopjuan",
+      showCountry: "🗺️ Trego hartën!",
+      cancelRotation: "🌀 Anulo rrotullimin",
+      settings: {
+        title: "Settings",
+        distanceUnit: "Njësia e largësisë",
+        theme: "Theme",
+        difficultyModifiers: "Modifikim i vështirësive",
+        startingNextDay: "Fillon ditën e ardhshme!",
+        noImageMode: "Fsheh foton e shtetin për të sfiduar më shumë.",
+        rotationMode: "Rrotullo foton e shtetit.",
+      },
+      buyMeACoffee: "Blejani ni ☕ ktij djalit!",
+    },
+  },
   en: {
     translation: {
       placeholder: "Country, territory...",
@@ -53,8 +75,8 @@ const resources = {
 
 i18n
   .use(initReactI18next)
-  .use(LanguageDetector)
   .init({
+    lng:"sq",
     resources,
     interpolation: {
       escapeValue: false,

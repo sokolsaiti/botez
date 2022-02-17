@@ -13,25 +13,25 @@ interface InfosProps {
 
 export function Infos({ isOpen, close, settingsData }: InfosProps) {
   return (
-    <Panel title="How to play" isOpen={isOpen} close={close}>
+    <Panel title="Si të luhet" isOpen={isOpen} close={close}>
       <div className="space-y-3 text-justify border-b-2 border-gray-200 pb-3 mb-3">
         <div>
-          Guess the <Worldle /> in 6 guesses.
+          Gjeje shtetin e shfaqur në <Worldle /> në 6 tentime.
         </div>
-        <div>Each guess must be a valid country, territory, ...</div>
+        <div>Çdo tentim duhet të jetë një shtet apo territor real, ...</div>
         <div>
-          After each guess, you will have the distance, the direction and the
-          proximity from your guess and the target country.
+          Pas çdo supozimi, ju shfaqet distanca, drejtimi dhe afërsia, ndërmjet
+          supozimit tuaj dhe shtetit që kërkohet
         </div>
       </div>
       <div className="space-y-3 text-justify border-b-2 border-gray-200 pb-3 mb-3">
-        <div className="font-bold">Examples</div>
+        <div className="font-bold">Shembujt</div>
         <div>
           <Guesses
             rowCount={1}
             guesses={[
               {
-                name: "Chile",
+                name: "Kili",
                 direction: "NE",
                 distance: 13_557_000,
               },
@@ -39,11 +39,10 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
             settingsData={settingsData}
           />
           <div className="my-2">
-            Your guess <span className="uppercase font-bold">Chile</span> is{" "}
-            {formatDistance(13557000, settingsData.distanceUnit)} away from the
-            target country, the target country is in the North-East direction
-            and you have a only 32% of proximity because it&apos;s quite far
-            away!
+            Supozimi yt <span className="uppercase font-bold">Kili</span> është{" "}
+            {formatDistance(13557000, settingsData.distanceUnit)} larg nga
+            shteti që kërkohet, poashtu shteti që kërkohet është në drejtimin
+            verilindor dhe afërsia është vetëm 32% sepse është mjaft larg
           </div>
         </div>
         <div>
@@ -51,7 +50,7 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
             rowCount={1}
             guesses={[
               {
-                name: "Finland",
+                name: "Finlanda",
                 direction: "SE",
                 distance: 3_206_000,
               },
@@ -59,10 +58,10 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
             settingsData={settingsData}
           />
           <div className="my-2">
-            Your second guess{" "}
-            <span className="uppercase font-bold">Finland</span> is getting
-            closer! {formatDistance(3206000, settingsData.distanceUnit)} away,
-            South-East direction and 84%!
+            Supozimi yt i dytë{" "}
+            <span className="uppercase font-bold">Finlanda</span> po afrohet! Në
+            {formatDistance(3206000, settingsData.distanceUnit)} largësi,
+            drejtimin juglindor dhe 84%!
           </div>
         </div>
         <div>
@@ -70,7 +69,7 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
             rowCount={1}
             guesses={[
               {
-                name: "Lebanon",
+                name: "Libani",
                 direction: "N",
                 distance: 0,
               },
@@ -78,29 +77,29 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
             settingsData={settingsData}
           />
           <div className="my-2">
-            Next guess, <span className="uppercase font-bold">Lebanon</span>,
-            it&apos;s the country to guess! Congrats! 🎉
+            Supozimi i rradhës,
+            <span className="uppercase font-bold">Libani</span>, është shteti që
+            kërkohet! Urime! 🎉
           </div>
         </div>
       </div>
       <div className="space-y-3 text-justify border-b-2 border-gray-200 pb-3 mb-3 font-bold">
-        A new <Worldle /> will be available every day!
+        Një <Worldle /> e re do të jetë në dispozicion çdo ditë!
       </div>
       <div className="space-y-3 text-justify border-b-2 border-gray-200 pb-3 mb-3">
-        <div className="font-bold">About distance</div>
+        <div className="font-bold">Mbi largësitë</div>
         <div>
-          The distances displayed correspond to the distances between the
-          selected and the target territory centers.
+          Largësitë e shfaqura llogariten sipas distancës ndërmjet pikave
+          qendrore të shteteve përkatëse.
         </div>
         <div>
-          For instance, the computed distance between United States and Canada
-          is around {formatDistance(2_260_000, settingsData.distanceUnit)} even
-          if they have a common border.
+          Për shembull, largësia e llogaritur ndërmjet SHBA dhe Kanadës është
+          rreth {formatDistance(2_260_000, settingsData.distanceUnit)} përkundër
+          faktit se këto dy shtete kanë kufi të përbashkët.
         </div>
       </div>
       <div className="space-y-3 text-justify border-b-2 border-gray-200 pb-3 mb-3">
-        <Worldle /> has been <span className="font-bold">heavily</span> inspired
-        by{" "}
+        <Worldle /> është frymëzuar nga{" "}
         <a
           className="underline"
           href="https://www.powerlanguage.co.uk/wordle/"
@@ -109,7 +108,7 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
         >
           Wordle
         </a>{" "}
-        created by{" "}
+        krijuar nga{" "}
         <a
           className="underline"
           href="https://twitter.com/powerlanguish"
@@ -122,7 +121,7 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
       </div>
       <div className="space-y-3 text-justify pb-3">
         <div>
-          Made by{" "}
+          Krijuar nga{" "}
           <a
             className="underline"
             href="https://twitter.com/teuteuf"
@@ -133,6 +132,17 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
           </a>
         </div>
         <div>
+          Përkthyer nga{" "}
+          <a
+            className="underline"
+            href="https://twitter.com/sokolsaiti"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            @sokolsaiti
+          </a>
+        </div>
+        <div>
           Want to support?{" "}
           <a
             className="underline"
@@ -140,7 +150,7 @@ export function Infos({ isOpen, close, settingsData }: InfosProps) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Buy me a coffee! ☕
+            Blejani ni kafe ktij djalit! ☕
           </a>
         </div>
       </div>
