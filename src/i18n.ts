@@ -22,6 +22,15 @@ const resources = {
         noImageMode: "Fsheh foton e shtetin për të sfiduar më shumë.",
         rotationMode: "Rrotullo foton e shtetit.",
       },
+      stats: {
+        title: "Statistikat",
+        played: "Luajtur",
+        win: "Fituar %",
+        currentStreak: "Seria e Tashme e fitoreve",
+        maxStreak: "Seria Maksimale e fitoreve",
+        averageBestDistance: "Distanca mesatare më e mirë",
+        guessDistributions: "Shpërndarja e fitoreve",
+      },
       buyMeACoffee: "Blejani ni ☕ ktij djalit!",
     },
   },
@@ -73,14 +82,12 @@ const resources = {
   },
 };
 
-i18n
-  .use(initReactI18next)
-  .init({
-    lng:"sq",
-    resources,
-    interpolation: {
-      escapeValue: false,
-    },
-  });
+i18n.use(initReactI18next).init({
+  lng: "sq",
+  resources,
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 export default i18n;
