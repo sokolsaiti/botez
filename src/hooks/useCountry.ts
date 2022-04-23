@@ -9,6 +9,7 @@ const forcedCountries: Record<string, string> = {
   "2022-04-01": "RS",
   "2022-04-02": "XK",
   "2022-04-04": "FO",
+  "2022-04-23": "YE",
 };
 
 export function useCountry(dayString: string): [Country, number, number] {
