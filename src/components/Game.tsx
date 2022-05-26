@@ -1,5 +1,5 @@
-import { DateTime } from "luxon";
 import React, {
+  ReactText,
   useCallback,
   useEffect,
   useMemo,
@@ -7,12 +7,7 @@ import React, {
   useState,
 } from "react";
 import { toast } from "react-toastify";
-import {
-  countries,
-  getCountryName,
-  sanitizeCountryName,
-} from "../domain/countries";
-import { useGuesses } from "../hooks/useGuesses";
+import { getCountryName, sanitizeCountryName } from "../domain/countries";
 import { CountryInput } from "./CountryInput";
 import * as geolib from "geolib";
 import { Share } from "./Share";
@@ -20,28 +15,37 @@ import { Guesses } from "./Guesses";
 import { useTranslation } from "react-i18next";
 import { SettingsData } from "../hooks/useSettings";
 import { useMode } from "../hooks/useMode";
-import { useCountry } from "../hooks/useCountry";
-
-function getDayString() {
-  return DateTime.now().toFormat("yyyy-MM-dd");
-}
+import { getDayString, useTodays } from "../hooks/useTodays";
+import { Twemoji } from "@teuteuf/react-emoji-render";
+import { countries } from "../domain/countries.position";
+import { useNewsNotifications } from "../hooks/useNewsNotifications";
 
 const MAX_TRY_COUNT = 6;
 
 interface GameProps {
   settingsData: SettingsData;
+  updateSettings: (newSettings: Partial<SettingsData>) => void;
 }
 
-export function Game({ settingsData }: GameProps) {
+export function Game({ settingsData, updateSettings }: GameProps) {
   const { t, i18n } = useTranslation();
-  const dayString = useMemo(getDayString, []);
+  const dayString = useMemo(
+    () => getDayString(settingsData.shiftDayCount),
+    [settingsData.shiftDayCount]
+  );
+
+  useNewsNotifications(dayString);
 
   const countryInputRef = useRef<HTMLInputElement>(null);
 
-  const [country, randomAngle, imageScale] = useCountry(dayString);
+  const [todays, addGuess, randomAngle, imageScale] = useTodays(dayString);
+  const { country, guesses } = todays;
+  const countryName = useMemo(
+    () => (country ? getCountryName(i18n.resolvedLanguage, country) : ""),
+    [country, i18n.resolvedLanguage]
+  );
 
   const [currentGuess, setCurrentGuess] = useState("");
-  const [guesses, addGuess] = useGuesses(dayString);
   const [hideImageMode, setHideImageMode] = useMode(
     "hideImageMode",
     dayString,
@@ -59,7 +63,11 @@ export function Game({ settingsData }: GameProps) {
 
   const handleSubmit = useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
+      if (country == null) {
+        return;
+      }
       e.preventDefault();
+      console.log(country);
       const guessedCountry = countries.find(
         (country) =>
           sanitizeCountryName(
@@ -75,7 +83,12 @@ export function Game({ settingsData }: GameProps) {
       const newGuess = {
         name: currentGuess,
         distance: geolib.getDistance(guessedCountry, country),
-        direction: geolib.getCompassDirection(guessedCountry, country),
+        direction: geolib.getCompassDirection(
+          guessedCountry,
+          country,
+          (origin, dest) =>
+            Math.round(geolib.getRhumbLineBearing(origin, dest) / 45) * 45
+        ),
       };
 
       addGuess(newGuess);
@@ -89,35 +102,62 @@ export function Game({ settingsData }: GameProps) {
   );
 
   useEffect(() => {
+    let toastId: ReactText;
+    const { country, guesses } = todays;
     if (
+      country &&
       guesses.length === MAX_TRY_COUNT &&
       guesses[guesses.length - 1].distance > 0
     ) {
-      toast.info(getCountryName(i18n.resolvedLanguage, country).toUpperCase(), {
-        autoClose: false,
-        delay: 2000,
-      });
+      toastId = toast.info(
+        getCountryName(i18n.resolvedLanguage, country).toUpperCase(),
+        {
+          autoClose: false,
+          delay: 2000,
+        }
+      );
     }
-  }, [country, guesses, i18n.resolvedLanguage]);
+
+    return () => {
+      if (toastId != null) {
+        toast.dismiss(toastId);
+      }
+    };
+  }, [todays, i18n.resolvedLanguage]);
 
   return (
     <div className="flex-grow flex flex-col mx-2">
       {hideImageMode && !gameEnded && (
         <button
-          className="border-2 uppercase my-2 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
+          className="font-bold border-2 p-1 rounded uppercase my-2 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
           type="button"
           onClick={() => setHideImageMode(false)}
         >
-          {t("showCountry")}
+          <Twemoji
+            text={t("showCountry")}
+            options={{ className: "inline-block" }}
+          />
         </button>
       )}
-      <div className="my-1">
+      <div className="flex my-1">
+        {settingsData.allowShiftingDay && settingsData.shiftDayCount > 0 && (
+          <button
+            type="button"
+            onClick={() =>
+              updateSettings({
+                shiftDayCount: Math.max(0, settingsData.shiftDayCount - 1),
+              })
+            }
+          >
+            <Twemoji text="↪️" className="text-xl" />
+          </button>
+        )}
         <img
-          className={`max-h-52 m-auto transition-transform duration-700 ease-in dark:invert ${
+          className={`pointer-events-none max-h-52 m-auto transition-transform duration-700 ease-in dark:invert ${
             hideImageMode && !gameEnded ? "h-0" : "h-full"
           }`}
           alt="country to guess"
-          src={`images/countries/${country.code.toLowerCase()}/vector.svg`}
+          src={`images/countries/${country?.code.toLowerCase()}/vector.svg`}
           style={
             rotationMode && !gameEnded
               ? {
@@ -126,14 +166,29 @@ export function Game({ settingsData }: GameProps) {
               : {}
           }
         />
+        {settingsData.allowShiftingDay && settingsData.shiftDayCount < 7 && (
+          <button
+            type="button"
+            onClick={() =>
+              updateSettings({
+                shiftDayCount: Math.min(7, settingsData.shiftDayCount + 1),
+              })
+            }
+          >
+            <Twemoji text="↩️" className="text-xl" />
+          </button>
+        )}
       </div>
       {rotationMode && !hideImageMode && !gameEnded && (
         <button
-          className="border-2 uppercase mb-2 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
+          className="font-bold rounded p-1 border-2 uppercase mb-2 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
           type="button"
           onClick={() => setRotationMode(false)}
         >
-          {t("cancelRotation")}
+          <Twemoji
+            text={t("cancelRotation")}
+            options={{ className: "inline-block" }}
+          />
         </button>
       )}
       <Guesses
@@ -143,7 +198,7 @@ export function Game({ settingsData }: GameProps) {
         countryInputRef={countryInputRef}
       />
       <div className="my-2">
-        {gameEnded ? (
+        {gameEnded && country ? (
           <>
             <Share
               guesses={guesses}
@@ -152,17 +207,32 @@ export function Game({ settingsData }: GameProps) {
               hideImageMode={hideImageMode}
               rotationMode={rotationMode}
             />
-            <a
-              className="underline w-full text-center block mt-4"
-              href={`https://www.google.com/maps?q=${getCountryName(
-                i18n.resolvedLanguage,
-                country
-              )}&hl=${i18n.resolvedLanguage}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("showOnGoogleMaps")}
-            </a>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <a
+                className="underline text-center block mt-4 whitespace-nowrap"
+                href={`https://www.google.com/maps?q=${countryName}+${country.code.toUpperCase()}&hl=${
+                  i18n.resolvedLanguage
+                }`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Twemoji
+                  text={t("showOnGoogleMaps")}
+                  options={{ className: "inline-block" }}
+                />
+              </a>
+              <a
+                className="underline text-center block mt-4 whitespace-nowrap"
+                href={`https://${i18n.resolvedLanguage}.wikipedia.org/wiki/${countryName}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Twemoji
+                  text={t("showOnWikipedia")}
+                  options={{ className: "inline-block" }}
+                />
+              </a>
+            </div>
           </>
         ) : (
           <form onSubmit={handleSubmit}>
@@ -173,10 +243,15 @@ export function Game({ settingsData }: GameProps) {
                 setCurrentGuess={setCurrentGuess}
               />
               <button
-                className="border-2 uppercase my-0.5 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
+                className="rounded font-bold p-1 flex items-center justify-center border-2 uppercase my-0.5 hover:bg-gray-50 active:bg-gray-100 dark:hover:bg-slate-800 dark:active:bg-slate-700"
                 type="submit"
               >
-                🌍 {t("guess")}
+                <Twemoji
+                  text="🌍"
+                  options={{ className: "inline-block" }}
+                  className="flex items-center justify-center"
+                />{" "}
+                <span className="ml-1">{t("guess")}</span>
               </button>
             </div>
           </form>
