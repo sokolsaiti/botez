@@ -67,7 +67,7 @@ export function Game({ settingsData, updateSettings }: GameProps) {
         return;
       }
       e.preventDefault();
-      console.log(country);
+
       const guessedCountry = countries.find(
         (country) =>
           sanitizeCountryName(
